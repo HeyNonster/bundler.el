@@ -74,7 +74,8 @@
          ((eq gem-location 'no-gemfile)
           (message "Could not find Gemfile"))
          (gem-location
-          (dired gem-location))
+          (dired gem-location)
+          (bundle-init-projectile-if-nonexistent))
          (t
           (message "Gem '%s' not found" gem-name))))))
 
@@ -254,6 +255,16 @@ found."
     (let* ((cmd "bundle list --paths")
            (bundle-out (shell-command-to-string cmd)))
       (split-string bundle-out "\n"))))
+
+(defun bundle-init-projectile-if-nonexistent ()
+  (when (and
+       (not (equal (projectile-project-root) default-directory))
+       (not (file-exists-p ".projectile"))
+       (not (file-exists-p ".git"))
+       (equal mode-name "Dired by name")
+       )
+      (make-empty-file ".projectile")
+      (projectile-invalidate-cache nil)))
 
 (provide 'bundler)
 ;;; bundler.el ends here.
